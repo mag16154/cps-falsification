@@ -1,4 +1,4 @@
-%% 2 dimensional linear system with dynamics
+%% 3 dimensional linear system with dynamics
 %% dx = -x, dy = x-y
 
 %% Apply the superposition principle to represent the distance vector 
@@ -10,24 +10,7 @@ clc;
 format shortg;
 
 %% Dimensionality of the system
-no_of_dimensions = 2;
-
-%% Initial conditions/variables
-%% Values later will be designated as 
-%% x1, x2, y1, y2.
-
-init_variables = ones(no_of_dimensions, 2);
-init_variables(1,:) = [4 9];
-init_variables(2,:) = [1 6];
-
-%% Co-ordinates of the unsafe states
-usafe = [5 3; 5 3.5; 5.5 3; 5.5 3.5];
-
-%% Base vector at time step 1  
-%% To be used later in the code to find displacement
-for idn=1:no_of_dimensions;
-	init_base_vector(idn) = init_variables(idn,2) - init_variables(idn,1);
-end
+no_of_dimensions = 3;
 
 %% No of initial states to be simulated 
 %% or the number of usafe states
@@ -36,12 +19,49 @@ end
 %% the state reachable after having moved along each dim
 no_of_elements= no_of_dimensions+2;
 
+
+%% Initial conditions/variables
+%% Values later will be designated as 
+%% x1, x2, y1, y2, z1, z2.
+
+init_variables = ones(no_of_dimensions, 2);
+init_variables(1,:) = [1 5];
+init_variables(2,:) = [0 3];
+init_variables(3,:) = [0 3];
+
+%% Unsafe conditions
+usafe_variables = ones(no_of_dimensions,2);
+usafe_variables(1,:) = [3.1 3.3];
+usafe_variables(2,:) = [2.4 2.6];
+usafe_variables(3,:) = [2.7 2.9];
+
+%% Populating the array of unsafe states
+usafe_state_array=zeros(no_of_elements, no_of_dimensions);
+
+%% First(center) and last usafe states
+for idn = 1:no_of_dimensions;
+	usafe_state_array(1,idn) = usafe_variables(idn,1);
+	usafe_state_array(no_of_elements,idn) = usafe_variables(idn,2);
+end
+
+%% Rest of the usafe states
+for idn = 1:no_of_dimensions;
+	for idx = 1:no_of_dimensions;
+		if (idx == idn);
+			usafe_state_array(idn+1, idx) = usafe_variables(idx,2);
+		else
+			usafe_state_array(idn+1, idx) = usafe_variables(idx,1);
+		end
+	end
+end
+
 %% Populating the array of initial states
 %% array_index -> state
-%% 1 -> (x1,y1) -- init/center state
-%% 2 -> (x2,y1) -- x changed
-%% 3 -> (x1,y2) -- y changed
-%% 4 -> (x2,y2) -- both changed
+%% 1 -> (x1,y1,z1) -- init/center state
+%% 2 -> (x2,y1,z1) -- x changed
+%% 3 -> (x1,y2,z1) -- y changed
+%% 4 -> (x1,y1,z2) -- z changed
+%% 5 -> (x2,y2,z2) -- all changed
 init_state_array=zeros(no_of_elements, no_of_dimensions);
 
 %% First(center) and last initial states
@@ -89,7 +109,7 @@ dist_center_usafe_euclid = zeros(size(traj_t,1), no_of_elements);
 for idn = 1:no_of_elements;
 	for idt = 1:size(traj_t,1);
 		pair(1,:) = traj_x(idt,:,1);
-		pair(2,:) = usafe(idn,:);
+		pair(2,:) = usafe_state_array(idn,:);
 		dist_center_usafe(idt,:,idn) = pair(2,:) - pair(1,:);
 		dist_center_usafe_euclid(idt,idn) = pdist(pair,'euclidean');
 	end
@@ -135,7 +155,19 @@ for idt = 1:size(traj_t,1);
 	%% beta = inv_base * distance
 	for idn=1:no_of_elements;
 		beta(idt,:,idn) = (inv_base(:,:)*transpose(dist_center_usafe(idt,:,idn)));
+		%temp_displacement = init_base_vector.*temp_beta;
+		%temp_init_state = init_state_array(1,:) + temp_displacement;
+		%logical_array = (temp_init_state<init_state_array(1,:));
+		%one_elements = find(logical_array);
+		%if (size(one_elements) == 0);
 	end
+end
+
+%% Find beta for min_distance_time_step to each unsafe point
+%% Not used - Just for debugging.
+beta_for_min_dist = zeros(no_of_dimensions, no_of_elements);
+for idn = 1:no_of_elements;
+	beta_for_min_dist(:, idn) = beta(min_dist_time_step(idn), :, idn);
 end
 
 %% Choose max-beta (out of no_of_dimensions) at each time step for each unsafe point
@@ -175,6 +207,12 @@ for idn= 2:no_of_elements;
 	end
 end
 
+%% Base vector at time step 1  
+%% To be used later in the code to find displacement
+for idn=1:no_of_dimensions;
+	init_base_vector(idn) = init_variables(idn,2) - init_variables(idn,1);
+end
+
 %% Compute the next init state for next run
 next_step_beta = beta(min_beta_time_step, :, min_beta_direction);
 displacement = init_base_vector.*next_step_beta;
@@ -186,6 +224,11 @@ plot(traj_t(:,1), max_beta_array(:,:));
 xlabel('Time'),
 ylabel('Beta'),
 
+figure(2);
+plot(traj_t(:,1), traj_x(:,:,1));
+
+figure(3);
+plot(base_vectors(:,:,2));
 % ============================================================================================
 % dvdt
 % ============================================================================================
@@ -201,11 +244,13 @@ k2=1;
 
 x=v(1);
 y=v(2);
+z=v(3);
 
 %% equations
 
 dv = [
     -k1*x;    	% dx/dt
     k1*x-k2*y;  % dy/dt
+    k2*y;	% dz/dt	
 ] ;
 end

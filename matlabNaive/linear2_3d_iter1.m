@@ -16,12 +16,15 @@ clc;
 %% Assuming initial set is [0,4]x[0,3]x[0,3]
 %% We start from the state (0,0,0).
 
-X = 2.0:0.5:3.0;
-Y = 0:0.5:1.0;
-Z = 0:0.5:1.0;
-
+%X = 2.0:0.5:3.0;
+%Y = 0:0.5:1.0;
+%Z = 0:0.5:1.0;
+%usafe = [1.3;0.6;1.08];
+X = 4:0.5:5;
+Y = 2:0.5:3;
+Z = 2:0.5:3;
 %% Co-ordinates of an unsafe state
-usafe = [1.3;0.6;1.08];
+usafe = [3.1;2.5;2.9];
 
 %% Total number of initial states to be simulated
 no_of_elements=numel(X)*numel(Y)*numel(Z);
