@@ -1,11 +1,10 @@
-%% 2 dimensional nonlinear system with dynamics
-%% x = y
-%% y = mu*(1-x*x)*y - x
+%% 3 dimensional nonlinear system with dynamics
+%% dxdt = y; dydt = z*z*sin(x)*cos(x) - sin(x) - epsilon*y; dzdt = alpha*(cos(x) - beta)
 
 clear all;
 clc;
 
-no_of_dims = 2
+no_of_dims = 3
 no_of_samples = 20
  
 init_state_array = rand(no_of_samples,no_of_dims)*10
@@ -49,40 +48,51 @@ end
 inputSeries = con2seq(x_t_inputs);
 targetSeries = con2seq(x_outputs);
 
-inputDelays = 1:2;
-feedbackDelays = 1:2;
-hiddenLayerSize = 10;
-net = narxnet(inputDelays,feedbackDelays,hiddenLayerSize);
+[cell_dim1 cell_dim2] = size(inputSeries);
+no_train_samples = (cell_dim2*1)/2;
+no_test_samples = cell_dim2 - no_train_samples;
+train_input = inputSeries(1, 1:no_train_samples);
+train_target = targetSeries(1, 1:no_train_samples);
+test_input = inputSeries(1, no_train_samples+1:cell_dim2);
+test_target = targetSeries(1, no_train_samples+1:cell_dim2);
+net = feedforwardnet(10);
+net.trainParam.epochs = 100;
+[net tr] = train(net,train_input, train_target);
 
-%net = layrecnet(1:2,10);
-[inputs,inputStates,layerStates,targets] = preparets(net,inputSeries,{},targetSeries);
+% View the Network
+view(net)
+wts = getwb(net);
+[b, IW, LW] = separatewb(net, wts);
+%weights = net.IW{1,1};
+%bias = net.b{1};
 
-net.divideParam.trainRatio = 70/100;
-net.divideParam.valRatio = 15/100;
-net.divideParam.testRatio = 15/100;
-
-% Train the Network
-[net,tr] = train(net,inputs,targets,inputStates,layerStates);
-
-% Test the Network
-outputs = net(inputs,inputStates,layerStates);
-errors = gsubtract(targets,outputs);
-performance = perform(net,targets,outputs)
+outputs = net(test_input);
+perf = perform(net,outputs,test_target)
 
 output_mat = cell2mat(outputs);
-target_mat = cell2mat(targets);
-[dim1 dim2] = size(output_mat);
-total_points = 1:1:dim2;
+target_mat = cell2mat(test_target);
+%[dim1 dim2] = size(output_mat);
+total_points = 1:1:no_test_samples;
+
 figure(1);
 clf;
 xlabel('Time');
-title('Vanderpol');
-subplot(2,1,1);
+title('Steam');
+subplot(3,1,1);
+plot(output_mat(1,:), output_mat(2,:), target_mat(1,:), target_mat(2,:))
+subplot(3,1,2);
+plot(output_mat(1,:), output_mat(3,:), target_mat(1,:), target_mat(3,:))
+subplot(3,1,3);
+plot(output_mat(2,:), output_mat(3,:), target_mat(2,:), target_mat(3,:))
+
+figure(2);
+subplot(3,1,1);
 plot(total_points(1,:), output_mat(1,:), total_points(1,:), target_mat(1,:))
-subplot(2,1,2);
+subplot(3,1,2);
 plot(total_points(1,:), output_mat(2,:), total_points(1,:), target_mat(2,:))
-% View the Network
-view(net)
+subplot(3,1,3);
+plot(total_points(1,:), output_mat(3,:), total_points(1,:), target_mat(3,:))
+
 	
 % ============================================================================================
 % dvdt
@@ -90,18 +100,21 @@ view(net)
 
 function dv = dxdt(t,v)
 
-%%% parameter set 1
+%%% parameter set
 
-mu=1;
-
+epsilon = 3;
+alpha = 1;
+beta = 1;
 %%% variables
 
 x=v(1);
 y=v(2);
+z=v(3);
 %%% equations
-
+%dxdt = y; dydt = z*z*sin(x)*cos(x) - sin(x) - epsilon*y; dzdt = alpha*(cos(x) - beta)
 dv = [
     y;  % dx/dt
-    mu*(1-x*x)*y - x;  	% dy/dt
+    z*z*sin(x)*cos(x) - sin(x) - epsilon*y;  	% dy/dt
+    alpha*(cos(x) - beta); %dz/dt
 ] ;
 end

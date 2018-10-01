@@ -77,7 +77,7 @@ total_points = 1:1:dim2;
 figure(1);
 clf;
 xlabel('Time');
-title('Vanderpol');
+title('roesseler');
 subplot(2,1,1);
 plot(total_points(1,:), output_mat(1,:), total_points(1,:), target_mat(1,:))
 subplot(2,1,2);

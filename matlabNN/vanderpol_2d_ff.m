@@ -1,6 +1,6 @@
 %% 2 dimensional nonlinear system with dynamics
-%% x = A + x * x * y - B * x - x
-%% y = B * x - x * x * y
+%% x = y
+%% y = mu*(1-x*x)*y - x
 
 
 clear all;
@@ -50,57 +50,42 @@ end
 inputSeries = con2seq(x_t_inputs);
 targetSeries = con2seq(x_outputs);
 
-%inputDelays = 1:4:6;
-%feedbackDelays = 1:4:6;
-%hiddenSizes = [10,5];
-%net.trainParam.epochs = 100;
-%net.layers{1}.size = 15;
-%net.layers{1}.transferFcn = 'tansig';
-%net.layers{1}.initFcn = 'initnw';
-%net.layers{1}.name = 'Hidden Layer 1';
-%net.initFcn = 'initlay';
-%net.performFcn = 'mse';
-%net.trainFcn='trainbr'; %default = 'trainlm'
-%net.divideFcn = 'dividerand';
-inputDelays = 0:1;
-feedbackDelays = 1:1;
-hiddenLayerSize = 10;
-net = narxnet(inputDelays,feedbackDelays,hiddenLayerSize);
+[cell_dim1 cell_dim2] = size(inputSeries);
+no_train_samples = (cell_dim2*1)/2;
+no_test_sampples = cell_dim2 - no_train_samples;
+train_input = inputSeries(1, 1:no_train_samples);
+train_target = targetSeries(1, 1:no_train_samples);
+test_input = inputSeries(1, no_train_samples+1:cell_dim2);
+test_target = targetSeries(1, no_train_samples+1:cell_dim2);
+net = feedforwardnet(10);
+net.trainParam.epochs = 100;
+[net tr] = train(net,train_input, train_target);
 
-%net = layrecnet(1:2,10);
-[inputs,inputStates,layerStates,targets] = preparets(net,inputSeries,{},targetSeries);
-
-net.divideParam.trainRatio = 70/100;
-net.divideParam.valRatio = 15/100;
-net.divideParam.testRatio = 15/100;
-
-% Train the Network
-[net,tr] = train(net,inputs,targets,inputStates,layerStates);
-
-% Test the Network
-outputs = net(inputs,inputStates,layerStates);
-errors = gsubtract(targets,outputs);
-performance = perform(net,targets,outputs)
-
-output_mat = cell2mat(outputs);
-target_mat = cell2mat(targets);
-[dim1 dim2] = size(output_mat);
-total_points = 1:1:dim2;
-figure(1);
-clf;
-xlabel('Time');
-title('Brusselator');
-legend('Output','Target');
-subplot(2,1,1);
-plot(total_points(1,:), output_mat(1,:), total_points(1,:), target_mat(1,:))
-subplot(2,1,2);
-plot(total_points(1,:), output_mat(2,:), total_points(1,:), target_mat(2,:))
 % View the Network
 view(net)
 wts = getwb(net);
 [b, IW, LW] = separatewb(net, wts);
 %weights = net.IW{1,1};
 %bias = net.b{1};
+
+outputs = net(test_input);
+perf = perform(net,outputs,test_target)
+
+output_mat = cell2mat(outputs);
+target_mat = cell2mat(test_target);
+[dim1 dim2] = size(output_mat);
+total_points = 1:1:dim2;
+figure(1);
+clf;
+xlabel('Time');
+title('Vanderpol');
+legend('Output','Target');
+subplot(3,1,1);
+plot(output_mat(1,:), output_mat(2,:), target_mat(1,:), target_mat(2,:))
+subplot(3,1,2);
+plot(total_points(1,:), output_mat(1,:), total_points(1,:), target_mat(1,:))
+subplot(3,1,3);
+plot(total_points(1,:), output_mat(2,:), total_points(1,:), target_mat(2,:))
 
 	
 % ============================================================================================
@@ -111,8 +96,7 @@ function dv = dxdt(t,v)
 
 %%% parameter set 1
 
-A=1;
-B=1.5;
+mu=1;
 
 %%% variables
 
@@ -121,7 +105,7 @@ y=v(2);
 %%% equations
 
 dv = [
-    A + x*x*y - B*x - x;  % dx/dt
-    B*x-x*x*y;  	% dy/dt
+    y;  % dx/dt
+    mu*(1-x*x)*y - x;  	% dy/dt
 ] ;
 end

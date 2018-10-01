@@ -48,27 +48,50 @@ end
 inputSeries = con2seq(x_t_inputs);
 targetSeries = con2seq(x_outputs);
 
+[cell_dim1 cell_dim2] = size(inputSeries);
+no_train_samples = (cell_dim2*1)/2;
+no_test_samples = cell_dim2 - no_train_samples;
+train_input = inputSeries(1, 1:no_train_samples);
+train_target = targetSeries(1, 1:no_train_samples);
+test_input = inputSeries(1, no_train_samples+1:cell_dim2);
+test_target = targetSeries(1, no_train_samples+1:cell_dim2);
 net = feedforwardnet(10);
 net.trainParam.epochs = 100;
-[net tr] = train(net,inputSeries,targetSeries);
+[net tr] = train(net,train_input, train_target);
+
+% View the Network
 view(net)
-outputs = net(inputSeries);
-perf = perform(net,outputs,targetSeries)
+wts = getwb(net);
+[b, IW, LW] = separatewb(net, wts);
+%weights = net.IW{1,1};
+%bias = net.b{1};
+
+outputs = net(test_input);
+perf = perform(net,outputs,test_target)
 
 output_mat = cell2mat(outputs);
-target_mat = cell2mat(targetSeries);
-[dim1 dim2] = size(output_mat);
-total_points = 1:1:dim2;
+target_mat = cell2mat(test_target);
+%[dim1 dim2] = size(output_mat);
+total_points = 1:1:no_test_samples;
+
 figure(1);
 clf;
 xlabel('Time');
-title('Vanderpol');
-subplot(2,1,1);
+title('roesseler');
+subplot(3,1,1);
+plot(output_mat(1,:), output_mat(2,:), target_mat(1,:), target_mat(2,:))
+subplot(3,1,2);
+plot(output_mat(1,:), output_mat(3,:), target_mat(1,:), target_mat(3,:))
+subplot(3,1,3);
+plot(output_mat(2,:), output_mat(3,:), target_mat(2,:), target_mat(3,:))
+
+figure(2);
+subplot(3,1,1);
 plot(total_points(1,:), output_mat(1,:), total_points(1,:), target_mat(1,:))
-subplot(2,1,2);
+subplot(3,1,2);
 plot(total_points(1,:), output_mat(2,:), total_points(1,:), target_mat(2,:))
-% View the Network
-view(net)
+subplot(3,1,3);
+plot(total_points(1,:), output_mat(3,:), total_points(1,:), target_mat(3,:))
 	
 % ============================================================================================
 % dvdt
