@@ -1,5 +1,5 @@
 %% 3 dimensional nonlinear system with dynamics
-%% dxdt = sigma*(y - x); dydt = x*(rho-z) - y; dzdt = x*y - beta*z;
+%% dxdt = -y-z; dydt = x+a*y; dzdt = b + z*(x-c)
 %% Computing the inverse of v_prime
 
 clear all;
@@ -30,7 +30,7 @@ end
 epochs = 100;
 neurons = 15;
 [net, output_v_values, target_v_values] = trainAndTestNN(inputSeries, targetSeries, epochs, neurons);
-plotFigures(output_v_values, target_v_values, no_of_dims, 'Lorentz');
+plotFigures(output_v_values, target_v_values, no_of_dims, 'Roesseler');
 [o_layer_output_vals, v_vals] = validateNN(net, traj_x, time_steps, no_of_dims, traj_combs);
 validation_norm_values = zeros(no_of_samples, time_steps-1); 
 for idx = 1:no_of_samples
@@ -47,9 +47,9 @@ function dv = dxdt(t,v)
 
 %%% parameter set
 
-sigma = 10.0;
-rho = 28.0;
-beta = 8.0 / 3.0;
+a = 0.2;
+b = 0.2;
+c = 5.7;
 
 %%% variables
 
@@ -57,11 +57,11 @@ x=v(1);
 y=v(2);
 z=v(3);
 %%% equations
-%dxdt = sigma*(y - x); dydt = x*(rho-z) - y; dzdt = x*y - beta*z;
+%dxdt = -y-z; dydt = x+a*y; dzdt = b + z*(x-c)
 dv = [
-    sigma*(y - x);  % dx/dt
-    x*(rho-z) - y;  % dy/dt
-    x*y - beta*z; %dz/dt
+    -y-z;  % dx/dt
+    x + a*y;  	% dy/dt
+    b + z*(x-c) %dz/dt
 ] ;
 end
 
