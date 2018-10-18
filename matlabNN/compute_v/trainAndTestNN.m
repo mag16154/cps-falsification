@@ -1,4 +1,5 @@
 function [net, output_v_values, target_v_values] = trainAndTestNN(inputSeries, targetSeries, epochs, neurons)
+
 [cell_dim1 cell_dim2] = size(inputSeries);
 total_points = 1:1:cell_dim2;
 total_points = total_points(randperm(length(total_points)));
