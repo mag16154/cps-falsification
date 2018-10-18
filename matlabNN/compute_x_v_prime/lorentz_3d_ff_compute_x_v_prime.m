@@ -5,6 +5,8 @@
 clear all;
 clc;
 
+addpath('./TwoLayers/');
+
 no_of_dims = 3
 no_of_trajs = 10
 traj_combs = combnk(1:no_of_trajs,2)
@@ -28,7 +30,7 @@ end
 [inputSeries, targetSeries] = createNNInput(traj_x, time_steps, no_of_dims, traj_combs);
 epochs = 100;
 neurons = 15;
-[net, output_mat, target_mat] = trainAndTestNN(inputSeries, targetSeries, epochs, neurons);
+[net, output_mat, target_mat] = trainAndTestNNPrep(inputSeries, targetSeries, epochs, neurons);
 [o_layer_output_vals, x_v_prime_vals] = validateNNPrep(net, traj_x, time_steps, no_of_dims, traj_combs);
 validation_x_norm_values = zeros(no_of_samples, time_steps-1);
 validation_v_norm_values = zeros(no_of_samples, time_steps-1);
@@ -39,22 +41,7 @@ for idx = 1:no_of_samples
 	end
 end
 
-
-[dim1 dim2] = size(output_mat);
-total_output_points = 1:1:dim2;
-output_x_plus_v_values = output_mat(1:no_of_dims,:) + output_mat(no_of_dims+1:2*no_of_dims,:);
-target_x_plus_v_values = target_mat(1:no_of_dims,:) + target_mat(no_of_dims+1:2*no_of_dims,:);
-figure(1);
-clf;
-xlabel('Time');
-title('Lorentz');
-legend('Output','Target');
-subplot(3,1,1);
-plot(total_output_points(1, :), output_x_plus_v_values(1,:), total_output_points(1,:), target_x_plus_v_values(1,:));
-subplot(3,1,2);
-plot(total_output_points(1, :), output_x_plus_v_values(2,:), total_output_points(1,:), target_x_plus_v_values(2,:));
-subplot(3,1,3);
-plot(total_output_points(1, :), output_x_plus_v_values(3,:), total_output_points(1,:), target_x_plus_v_values(3,:));
+plotFigures(output_mat, target_mat, no_of_dims, 'Lorentz');
 	
 % ============================================================================================
 % dvdt
