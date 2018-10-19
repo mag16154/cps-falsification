@@ -9,7 +9,7 @@ figure(1);
 clf;
 xlabel('Time');
 title(model_name);
-legend('Output','Target');
+%legend('Output','Target');
 if no_of_dims == 2
 	subplot(2,1,1);
     plot(total_output_points(1, :), output_x_plus_v_values(1,:), total_output_points(1,:), target_x_plus_v_values(1,:));

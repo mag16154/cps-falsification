@@ -1,4 +1,4 @@
-function [o_layer_output_vals, x_v_prime_vals] = validateNN(net, traj_x, time_steps, no_of_dims, traj_combs) 
+function [x_mse, v_mse] = validateNN(net, traj_x, time_steps, no_of_dims, traj_combs) 
 
 wts = getwb(net);
 [b, IW, LW] = separatewb(net, wts);
@@ -29,4 +29,22 @@ for idx = 1:no_of_samples
 		o_layer_output_vals(idx, :, idy) = o_layer_output(:);
 	end
 end
+
+%validation_x_norm_values = zeros(no_of_samples, time_steps-1);
+%validation_v_norm_values = zeros(no_of_samples, time_steps-1);
+x_mse = immse(o_layer_output_vals(:, 1:no_of_dims, :), x_v_prime_vals(:, 1:no_of_dims, :));
+v_mse = immse(o_layer_output_vals(:, no_of_dims+1:2*no_of_dims, :), x_v_prime_vals(:, no_of_dims+1:2*no_of_dims, :));
+%for idx = 1:no_of_samples
+%	for idy=1:(time_steps-1)
+%		validation_x_norm_values(idx,idy) = norm(o_layer_output_vals(idx,1:no_of_dims,idy) - x_v_prime_vals(idx,1:no_of_dims,idy));
+%		validation_v_norm_values(idx,idy) = norm(o_layer_output_vals(idx,no_of_dims+1:2*no_of_dims,idy) - x_v_prime_vals(idx,no_of_dims+1:2*no_of_dims,idy));
+%	end
+%end
+
+%sum_x_validation_norm = zeros(1,time_steps-1);
+%sum_v_validation_norm = zeros(1,time_steps-1);
+%for idy = 1:(time_steps-1)
+%	sum_x_validation_norm(idy) = sum(validation_x_norm_values(:,idy))/no_of_samples;
+%	sum_v_validation_norm(idy) = sum(validation_v_norm_values(:,idy))/no_of_samples;
+%end
 end

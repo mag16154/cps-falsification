@@ -22,8 +22,8 @@ net = feedforwardnet(neurons);
 net.trainParam.epochs = epochs;
 net.inputs{1}.processFcns = {};
 net.outputs{2}.processFcns = {};
-[net tr] = train(net,train_input, train_target);
-
+[net, tr] = train(net,train_input, train_target);
+%plotperform(tr);	
 % View the Network
 view(net)
 wts = getwb(net);

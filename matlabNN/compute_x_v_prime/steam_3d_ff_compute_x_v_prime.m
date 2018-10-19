@@ -5,6 +5,8 @@
 clear all;
 clc;
 
+addpath('./TwoLayers/');
+
 no_of_dims = 3
 no_of_trajs = 10
 traj_combs = combnk(1:no_of_trajs,2)
@@ -29,17 +31,7 @@ end
 epochs = 100;
 neurons = 25;
 [net, output_mat, target_mat] = trainAndTestNN(inputSeries, targetSeries, epochs, neurons);
-[o_layer_output_vals, x_v_prime_vals] = validateNNPrep(net, traj_x, time_steps, no_of_dims, traj_combs);
-validation_x_norm_values = zeros(no_of_samples, time_steps-1);
-validation_v_norm_values = zeros(no_of_samples, time_steps-1);
-for idx = 1:no_of_samples
-	for idy=1:(time_steps-1)
-		validation_x_norm_values(idx,idy) = norm(o_layer_output_vals(idx,1:no_of_dims,idy) - x_v_prime_vals(idx,1:no_of_dims,idy));
-		validation_v_norm_values(idx,idy) = norm(o_layer_output_vals(idx,no_of_dims+1:2*no_of_dims,idy) - x_v_prime_vals(idx,no_of_dims+1:2*no_of_dims,idy));
-	end
-end
-
-
+%[x_mse, v_mse] = validateNNPrep(net, traj_x, time_steps, no_of_dims, traj_combs);
 plotFigures(output_mat, target_mat, no_of_dims, 'Steam');
 
 % ============================================================================================

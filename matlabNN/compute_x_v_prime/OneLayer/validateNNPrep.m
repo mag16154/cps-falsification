@@ -1,11 +1,11 @@
-function [o_layer_output_vals, x_v_prime_vals] = validateNNPrep(net, traj_x, time_steps, no_of_dims, traj_combs) 
+function [x_mse, v_mse] = validateNNPrep(net, traj_x, time_steps, no_of_dims, traj_combs) 
 
 wts = getwb(net);
 [b, IW, LW] = separatewb(net, wts);
 [no_of_samples, elems] = size(traj_combs);
 o_layer_output_vals = zeros(no_of_samples, 2*no_of_dims, time_steps-1);
 x_v_prime_vals = zeros(no_of_samples, 2*no_of_dims, time_steps-1);
-for idx = 1:3
+for idx = 1:no_of_samples
 	trajs = traj_combs(idx, :);
 	central_traj = traj_x(:, :, trajs(1));
 	second_traj = traj_x(:, :, trajs(2));
@@ -38,4 +38,7 @@ for idx = 1:3
 %		validation_norm_values(idx,idy) = norm(o_layer_output(:)- v_val(:));
 	end
 end
+x_mse = immse(o_layer_output_vals(:, 1:no_of_dims, :), x_v_prime_vals(:, 1:no_of_dims, :));
+v_mse = immse(o_layer_output_vals(:, no_of_dims+1:2*no_of_dims, :), x_v_prime_vals(:, no_of_dims+1:2*no_of_dims, :));
+
 end
