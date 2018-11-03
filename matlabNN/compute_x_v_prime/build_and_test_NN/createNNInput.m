@@ -12,7 +12,8 @@ for idx = 1:no_of_samples
         	v_val = second_traj(idy,:) - x_val; 
         	%time_step = traj_t(idy, idx);
 		time_step_idx = randi(time_steps-idy);
-		t_val = idy+time_step_idx;        	
+		t_val = idy+time_step_idx;
+
 		x_v_t_inp_pair = [x_val v_val t_val];
         	x_prime_val = central_traj(t_val, :);
         	v_prime_val = second_traj(t_val, :) - x_prime_val;

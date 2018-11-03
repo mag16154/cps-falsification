@@ -1,11 +1,11 @@
 %% 2 dimensional nonlinear system with dynamics
 %% x = y
 %% y = mu*(1-x*x)*y - x
-%% Computing basis vectors for each pair of trajectories
-
 
 clear all;
 clc;
+
+addpath('./bulid_and_test_NN/');
 
 no_of_dims = 2
 no_of_trajs = 10
@@ -26,13 +26,17 @@ for idx = 1:no_of_samples
 	traj_x(:,:,idx) = x;
 end
 
-
 [time_steps elems] = size(traj_t);
 [inputSeries, targetSeries] = createNNInput(traj_x, time_steps, no_of_dims, traj_combs);
-epochs = 100;
-neurons = 30;
-[net, output_mat, target_mat] = trainAndTestNN(inputSeries, targetSeries, epochs, neurons);
-%[x_mse, v_mse] = validateNNPrep(net, traj_x, time_steps, no_of_dims, traj_combs);
+epochs =10;
+layers = 2;
+neurons = zeros(1, layers);
+neurons(1, 1) = 10;
+neurons(1, 2) = 10;
+preprocess = false;
+[net, output_mat, target_mat] = trainAndTestNN(inputSeries, targetSeries, epochs, neurons, layers, preprocess);
+%v_rae = validateNN(net, traj_x, time_steps, no_of_dims, traj_combs, layers, preprocess);
+
 plotFigures(output_mat, target_mat, no_of_dims, 'Vanderpol');
 	
 % ============================================================================================

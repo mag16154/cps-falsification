@@ -1,9 +1,10 @@
 %% 3 dimensional nonlinear system with dynamics
 %% dxdt = -y-z; dydt = x+a*y; dzdt = b + z*(x-c)
-%% Computing the inverse of v_prime
 
 clear all;
 clc;
+
+addpath('./bulid_and_test_NN/');
 
 no_of_dims = 3
 no_of_trajs = 10
@@ -25,19 +26,18 @@ for idx = 1:no_of_samples
 end
 
 [time_steps elems] = size(traj_t);
-
 [inputSeries, targetSeries] = createNNInput(traj_x, time_steps, no_of_dims, traj_combs);
-epochs = 100;
-neurons = 15;
-[net, output_v_values, target_v_values] = trainAndTestNN(inputSeries, targetSeries, epochs, neurons);
-plotFigures(output_v_values, target_v_values, no_of_dims, 'Roesseler');
-[o_layer_output_vals, v_vals] = validateNN(net, traj_x, time_steps, no_of_dims, traj_combs);
-validation_norm_values = zeros(no_of_samples, time_steps-1); 
-for idx = 1:no_of_samples
-	for idy=1:(time_steps-1)
-		validation_norm_values(idx,idy) = norm(o_layer_output_vals(idx,:,idy) - v_vals(idx,:,idy));
-	end
-end
+epochs =10;
+layers = 2;
+neurons = zeros(1, layers);
+neurons(1, 1) = 10;
+neurons(1, 2) = 10;
+preprocess = false
+[net, output_mat, target_mat] = trainAndTestNN(inputSeries, targetSeries, epochs, neurons, layers, preprocess);
+%v_rae = validateNN(net, traj_x, time_steps, no_of_dims, traj_combs, layers, preprocess);
+
+plotFigures(output_mat, target_mat, no_of_dims, 'Roesseler');
+
 	
 % ============================================================================================
 % dvdt
@@ -64,4 +64,3 @@ dv = [
     b + z*(x-c) %dz/dt
 ] ;
 end
-
