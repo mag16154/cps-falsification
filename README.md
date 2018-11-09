@@ -5,5 +5,4 @@ Code commits related to our work on CPS Falsification.
 
 2) matlabNN folder contains the code related to using neural network for exploring the state space or learning the system dynamics.
 
-2a) 'OneLayer' has a neural network setup with just one hidden layer.
-2b) 'TwoLayers' setup has two hidden layers in the neural network setup.
+3) pyExploreNN has the code in python to explore state space. There are multiple variants of predicting v and vprime. The description is available on top of each file.
