@@ -40,8 +40,11 @@ if preprocess == false
 	end
 end
 
-%[net, tr] = train(net,train_input, train_target);
-[net, tr] = train(net,train_input,train_target,{},{},1./cell2mat(train_target));
+%for i = 1:layers
+%    net.layers{i}.transferFcn = 'poslin'; % 'tansig'; 'poslin';
+%end
+[net, tr] = train(net,train_input, train_target);
+%[net, tr] = train(net,train_input,train_target,{},{},1./cell2mat(train_target));
 %plotperform(tr);	
 % View the Network
 view(net)

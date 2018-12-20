@@ -27,12 +27,15 @@ end
 
 [time_steps elems] = size(traj_t);
 [inputSeries, targetSeries] = createNNInput(traj_x, time_steps, no_of_dims, traj_combs);
-epochs =10;
+epochs =100;
 layers = 2;
+%neurons = 10;
 neurons = zeros(1, layers);
 neurons(1, 1) = 10;
 neurons(1, 2) = 10;
-preprocess = false
+%neurons(1, 3) = 10;
+%neurons(1, 4) = 10;
+preprocess = true
 [net, output_mat, target_mat] = trainAndTestNN(inputSeries, targetSeries, epochs, neurons, layers, preprocess);
 %v_rae = validateNN(net, traj_x, time_steps, no_of_dims, traj_combs, layers, preprocess);
 
