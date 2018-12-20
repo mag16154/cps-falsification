@@ -1,5 +1,5 @@
 import sys
-sys.path.append('../Configuration_setup/')
+sys.path.append('../NNConfiguration_setup/')
 import numpy as np
 from NNConfiguration import NNConfiguration
 from itertools import combinations
