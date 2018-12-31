@@ -5,9 +5,10 @@ from NNConfiguration import NNConfiguration
 from itertools import combinations
 import random
 
-## Input (x,v,x')
-## Output v'
-## x are taken at consecutive times but x' is picked at a random time
+# Input (x,v,x')
+# Output v'
+# x are taken at consecutive times but x' is picked at a random time
+
 
 class nnOnStateSpace(NNConfiguration):
 

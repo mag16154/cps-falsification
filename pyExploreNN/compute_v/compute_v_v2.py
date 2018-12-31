@@ -4,11 +4,12 @@ import numpy as np
 from NNConfiguration import NNConfiguration
 from itertools import combinations
 
-## Input (x,v',x')
-## Output v
-## x and x' are taken at jump times
-## We also add samples for every increase in jump_size in order to
-## keep the number of input/output pairs same across each jump_size run
+# Input (x,v',x')
+# Output v
+# x and x' are taken at jump times
+# We also add samples for every increase in jump_size in order to
+# keep the number of input/output pairs same across each jump_size run
+
 
 class nnOnStateSpace(NNConfiguration):
 

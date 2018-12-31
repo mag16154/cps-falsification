@@ -1,15 +1,11 @@
-import sys
-import numpy as np
 import matplotlib.pyplot as plt
 from configuration import configuration
 from frechet import normTrajectory, norm
-from sklearn.preprocessing import StandardScaler
 from sklearn.neural_network import MLPRegressor
 from sklearn.model_selection import train_test_split
 from analyzer import visualizePerturbations
 from sklearn.metrics import mean_squared_error
-from itertools import combinations
-import random
+
 
 class NNConfiguration(configuration):
 
@@ -44,17 +40,17 @@ class NNConfiguration(configuration):
                                random_state=1)
 
         clf.fit(X_train, Y_train)
-        #train_predictions = clf.predict(X_train)
+        # train_predictions = clf.predict(X_train)
         test_predictions = clf.predict(X_test)
         print("Y_test length {} test_predictions length {}".format(len(Y_test), len(test_predictions)))
 
         mse = mean_squared_error(Y_test, test_predictions)
         print("Mean Squared error {}".format(mse))
-        #mseError = 0.0
-        #for idx in range(0, len(test_predictions)):
+        # mseError = 0.0
+        # for idx in range(0, len(test_predictions)):
         #    mseError += mean_squared_error(test_predictions[idx], Y_test[idx])
-        #mseError = mseError/len(test_predictions)
-        #print("Manual MSE {}".format(mseError))
+        # mseError = mseError/len(test_predictions)
+        # print("Manual MSE {}".format(mseError))
         relativeError = []
         for idx in range(0, len(test_predictions)):
             distVal = norm(test_predictions[idx] - Y_test[idx], -1)

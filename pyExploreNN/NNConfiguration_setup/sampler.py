@@ -1,82 +1,84 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import random as rand
 from frechet import norm
 
+
 def generateRandomState(lowerBoundArray, upperBoundArray):
 
-	dimensions = len(upperBoundArray)
-	state = []
+    dimensions = len(upperBoundArray)
+    state = []
 
-	for dim in range(0, dimensions):
-		state += [rand.uniform(lowerBoundArray[dim], upperBoundArray[dim])]
+    for dim in range(0, dimensions):
+        state += [rand.uniform(lowerBoundArray[dim], upperBoundArray[dim])]
 
-	return state
+    return state
+
 
 def generateRandomStates(numStates, lowerBoundArray, upperBoundArray):
-	# given an array on upper and lower bound and the number of states
-	# generates an array of the number of states with uniform random distribution.
+    # given an array on upper and lower bound and the number of states
+    # generates an array of the number of states with uniform random distribution.
 
-	iterator = 0
-	states = []
+    iterator = 0
+    states = []
 
-	for iterator in range(0, numStates):
-		states += [generateRandomState(lowerBoundArray, upperBoundArray)]
+    for iterator in range(0, numStates):
+        states += [generateRandomState(lowerBoundArray, upperBoundArray)]
 
-	return states
+    return states
+
 
 def generateRandomVectors(dimensions):
 
-	return np.random.rand(dimensions, dimensions)
+    return np.random.rand(dimensions, dimensions)
+
 
 def generateRandomCoefficients(dimensions):
 
-	return np.random.rand(dimensions)
+    return np.random.rand(dimensions)
+
 
 def generateSuperpositionSampler(lowerBoundArray, upperBoundArray):
 
-	magnitude = 3
+    magnitude = 3
 
-	dimensions = len(upperBoundArray)
+    dimensions = len(upperBoundArray)
 
-	center = generateRandomState(lowerBoundArray, upperBoundArray)
+    center = generateRandomState(lowerBoundArray, upperBoundArray)
 
-	vectors = generateRandomVectors(dimensions)
-	coeffs = generateRandomCoefficients(dimensions)
+    vectors = generateRandomVectors(dimensions)
+    coeffs = generateRandomCoefficients(dimensions)
 
-	#print("Center {} vectors {} coeffs {}".format(center, vectors, coeffs))
-	states = [center]
+    # print("Center {} vectors {} coeffs {}".format(center, vectors, coeffs))
+    states = [center]
 
-	iterator = 0
-	for iterator in range(0, dimensions):
-		states += [center + vectors[iterator]]
+    iterator = 0
+    for iterator in range(0, dimensions):
+        states += [center + vectors[iterator]]
 
-	print("states: {}".format(states))
-	fringe = np.zeros(dimensions)
+    print("states: {}".format(states))
+    fringe = np.zeros(dimensions)
 
-	#fringe += center
+    # fringe += center
 
-	for iterator in range(0, dimensions):
-		fringe += coeffs[iterator]*vectors[iterator]
+    for iterator in range(0, dimensions):
+        fringe += coeffs[iterator]*vectors[iterator]
 
-	normFringe = norm(fringe, 2)
+    normFringe = norm(fringe, 2)
 
-	#print (normFringe)
+    # print (normFringe)
 
-	coeffs = (2*coeffs)/normFringe
+    coeffs = (2*coeffs)/normFringe
 
-	fringe = (2*fringe)/normFringe
+    fringe = (2*fringe)/normFringe
 
-	fringe += center
+    fringe += center
 
-	states += [fringe]
+    states += [fringe]
 
-	#print(states)
+    # print(states)
 
-	#print(coeffs)
+    # print(coeffs)
 
-	return states,vectors,coeffs
+    return states,vectors,coeffs
 
-
-
-#TODO: plotter for the random states generated.
+# TODO: plotter for the random states generated.
