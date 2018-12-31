@@ -40,8 +40,10 @@ if preprocess == false
 	end
 end
 
-%[net, tr] = train(net,train_input, train_target);
-[net, tr] = train(net,train_input,train_target,{},{},1./cell2mat(train_target));
+[Xs,Xi,Ai,Ts] = preparets(net,train_input,train_target);
+[net tr] = train(net, Xs, Ts, Xi, Ai);
+%[net, tr] = train(net,train_input, train_target, {}, {}, ew);
+%[net, tr] = train(net,train_input,train_target,{},{});
 %plotperform(tr);	
 % View the Network
 view(net)
