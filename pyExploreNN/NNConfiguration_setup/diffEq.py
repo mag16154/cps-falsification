@@ -32,8 +32,16 @@ def rhsODE(state, time, dynamics):
 		return coupledVanderpol(state, time)
 	if dynamics is 'HybridLinearOscillator':
 		return hybridLinearOscillator(state, time)
+	if dynamics is 'HybridLinearOscillator1':
+		return hybridLinearOscillator1(state, time)
+	if dynamics is 'HybridLinearOscillator2':
+		return hybridLinearOscillator2(state, time)
 	if dynamics is 'SmoothHybridLinearOscillator':
 		return smoothHybridLinearOscillator(state, time)
+	if dynamics is 'SmoothHybridLinearOscillator1':
+		return smoothHybridLinearOscillator1(state, time)
+	if dynamics is 'SmoothHybridLinearOscillator2':
+		return smoothHybridLinearOscillator2(state, time)
 	if dynamics is 'RegularOscillator':
 		return regularOscillator(state, time)
 	if dynamics is 'BiologicalModel1':
@@ -57,6 +65,7 @@ def vanderpol(state, time):
 	rhs = [dxdt, dydt]
 	return rhs
 
+
 def gravity(state, time):
 	# gravity
 	# dxdt = y; dydt = -9.8;
@@ -71,6 +80,7 @@ def gravity(state, time):
 
 	rhs = [dxdt, dydt]
 	return rhs
+
 
 def jetengine(state, time):
 	# jet-engine dynamics
@@ -104,6 +114,7 @@ def brussellator(state, time):
 	rhs = [dxdt, dydt]
 	return rhs
 
+
 def buckling(state, time):
 	# Buckling Column
 	# dxdt = y; dydt = 2x - x*x*x - 0.2*y + 0.1;
@@ -117,6 +128,7 @@ def buckling(state, time):
 
 	rhs = [dxdt, dydt]
 	return rhs
+
 
 def lotkavolterra(state, time):
 	# Predator prey also known as Lotka-Volterra
@@ -138,6 +150,7 @@ def lotkavolterra(state, time):
 	rhs = [dxdt, dydt]
 	return rhs
 
+
 def lacoperon(state, time):
 	# Lac-operon model
 	# dIidt = -0.4*Ii*Ii*((0.0003*G*G + 0.008) / (0.2*Ii*Ii + 2.00001) ) + 0.012 + (0.0000003 * (54660 - 5000.006*Ii) * (0.2*Ii*Ii + 2.00001)) / (0.00036*G*G + 0.00960018 + 0.000000018*Ii*Ii)
@@ -152,6 +165,7 @@ def lacoperon(state, time):
 
 	rhs = [dIidt, dGdt]
 	return rhs
+
 
 def roesseler(state, time):
 	# Roesseler attractor dynamics
@@ -174,6 +188,7 @@ def roesseler(state, time):
 	rhs = [dxdt, dydt, dzdt]
 	return rhs
 
+
 def steam(state, time):
 	# Steam Governer system
 	# dxdt = y; dydt = z*z*sin(x)*cos(x) - sin(x) - epsilon*y; dzdt = alpha*(cos(x) - beta)
@@ -195,6 +210,7 @@ def steam(state, time):
 	rhs = [dxdt, dydt, dzdt]
 	return rhs
 
+
 def lorentz(state, time):
 	# lorenz attractor dynamics
 	# dxdt = sigma*(y - x); dydt = x*(rho-z) - y; dzdt = x*y - beta*z;
@@ -215,6 +231,7 @@ def lorentz(state, time):
 
 	rhs = [dxdt, dydt, dzdt]
 	return rhs
+
 
 def springpendulun(state, time):
 	# Spring pendulum system
@@ -241,6 +258,7 @@ def springpendulun(state, time):
 	rhs = [drdt, dthetadt, dvrdt, domegadt]
 	return rhs
 
+
 def coupledVanderpol(state, time):
 	# Coupled Vanderpol oscillator
 	# dx1dt = y1; dy1dt = (1 - x1*x1)*y1 - x1 + (x2-x1)
@@ -259,6 +277,47 @@ def coupledVanderpol(state, time):
 
 	rhs = [dx1dt, dy1dt, dx2dt, dy2dt]
 	return rhs
+
+def hybridLinearOscillator1(state, time):
+	# when x > 0, the speed 2x,
+	# when x <= 0, then speed 1x
+	# dx1dt = y1; dy1dt = -x1;
+	# dx1dt = 2y1; dy1dt = -2*x1;
+
+	x1 = state[0]
+	y1 = state[1]
+
+	dx1dt = 0
+	dy1dt = 0
+
+
+	dx1dt = y1
+	dy1dt = -1*x1
+
+	rhs = [dx1dt, dy1dt]
+
+	return rhs
+
+def hybridLinearOscillator2(state, time):
+	# when x > 0, the speed 2x,
+	# when x <= 0, then speed 1x
+	# dx1dt = y1; dy1dt = -x1;
+	# dx1dt = 2y1; dy1dt = -2*x1;
+
+	x1 = state[0]
+	y1 = state[1]
+
+	dx1dt = 0
+	dy1dt = 0
+
+
+	dx1dt = 2*y1
+	dy1dt = -2*x1
+
+	rhs = [dx1dt, dy1dt]
+
+	return rhs
+
 
 def hybridLinearOscillator(state, time):
 	# when x > 0, the speed 2x,
@@ -283,6 +342,69 @@ def hybridLinearOscillator(state, time):
 	rhs = [dx1dt, dy1dt]
 
 	return rhs
+
+def smoothHybridLinearOscillator1(state, time):
+	# smoothen the dynamics by performing a linear interpolation.
+	# when x > 0, the speed 2x,
+	# when x <= 0, then speed 1x
+	# dx1dt = y1; dy1dt = -x1;
+	# dx1dt = 2y1; dy1dt = -2*x1;
+
+	x1 = state[0]
+	y1 = state[1]
+	scale = 1.0
+
+	g1 = 1.0/(1.0 + np.exp(scale*x1))
+	g2 = 1.0/(1.0 + np.exp(scale*-1*x1))
+
+	lambda1 = g1/(g1+g2)
+
+
+	dx2dt = 0
+	dy2dt = 0
+
+	dx1dt = y1
+	dy1dt = -1*x1
+
+	fdx1dt = lambda1*dx1dt + (1-lambda1)*dx2dt
+	fdy1dt = lambda1*dy1dt + (1-lambda1)*dy2dt
+
+	rhs = [fdx1dt, fdy1dt]
+
+	#print rhs
+
+	return rhs
+
+def smoothHybridLinearOscillator2(state, time):
+	# smoothen the dynamics by performing a linear interpolation.
+	# when x > 0, the speed 2x,
+	# when x <= 0, then speed 1x
+	# dx1dt = y1; dy1dt = -x1;
+	# dx1dt = 2y1; dy1dt = -2*x1;
+
+	x1 = state[0]
+	y1 = state[1]
+	scale = 1.0
+
+	g1 = 1.0/(1.0 + np.exp(scale*x1))
+	g2 = 1.0/(1.0 + np.exp(scale*-1*x1))
+
+	lambda1 = g1/(g1+g2)
+
+	dx1dt = 0
+	dy1dt = 0
+	dx2dt = 2*y1
+	dy2dt = -2*x1
+
+	fdx1dt = lambda1*dx1dt + (1-lambda1)*dx2dt
+	fdy1dt = lambda1*dy1dt + (1-lambda1)*dy2dt
+
+	rhs = [fdx1dt, fdy1dt]
+
+	#print rhs
+
+	return rhs
+
 
 def smoothHybridLinearOscillator(state, time):
 	# smoothen the dynamics by performing a linear interpolation.
@@ -321,6 +443,7 @@ def smoothHybridLinearOscillator(state, time):
 
 	return rhs
 
+
 def regularOscillator(state, time):
 
 	x1 = state[0]
@@ -332,6 +455,7 @@ def regularOscillator(state, time):
 	rhs = [dx1dt, dy1dt]
 
 	return rhs
+
 
 def biologicalModel_1(state, time):
 

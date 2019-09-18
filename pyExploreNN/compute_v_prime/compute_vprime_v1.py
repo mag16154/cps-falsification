@@ -1,7 +1,7 @@
 import sys
 sys.path.append('../NNConfiguration_setup/')
 import numpy as np
-from NNConfiguration import NNConfiguration
+from NNConfiguration import NNConfiguration_v1
 from itertools import combinations
 import random
 
@@ -47,5 +47,7 @@ class nnOnStateSpace(NNConfiguration):
                 input.append(x_v_xp_pair)
                 output.append(vprime_val)
         print(len(input))
+        print(input[0])
+        print(output[0])
         self.input = np.asarray(input)
         self.output = np.asarray(output)
